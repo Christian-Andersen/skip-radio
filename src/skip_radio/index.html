@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkipRadio - Live Stream</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background: #0b0b0e;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .radio-card {
+            background: #13131a;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            border: 1px solid #22222e;
+            width: 320px;
+        }
+        h1 {
+            color: #00ff88;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 5px;
+            font-size: 2rem;
+        }
+        .status {
+            color: #8a8a93;
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+        }
+        .btn-play {
+            background: #00ff88;
+            color: #0b0b0e;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-play:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 255, 136, 0.5);
+        }
+        .btn-play.playing {
+            background: #ff3b30;
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 59, 48, 0.3);
+        }
+        audio {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="radio-card">
+        <h1>SkipRadio</h1>
+        <div class="status" id="stream-status">Connecting to live stream...</div>
+        <audio id="audio-player" preload="auto">
+            <source src="/stream" type="audio/mp3">
+        </audio>
+        <button class="btn-play" id="action-btn">Tune In</button>
+    </div>
+    <script>
+        const audio = document.getElementById('audio-player');
+        const actionBtn = document.getElementById('action-btn');
+        const statusText = document.getElementById('stream-status');
+        function startRadio() {
+            audio.play()
+                .then(() => {
+                    statusText.innerText = "● LIVE STREAMING";
+                    statusText.style.color = "#00ff88";
+                    actionBtn.innerText = "Mute / Pause";
+                    actionBtn.classList.add('playing');
+                })
+                .catch((error) => {
+                    statusText.innerText = "Click below to unmute & listen live";
+                    actionBtn.innerText = "Listen Live";
+                });
+        }
+        document.addEventListener("DOMContentLoaded", startRadio);
+        actionBtn.addEventListener('click', () => {
+            if (audio.paused) {
+                audio.play();
+                statusText.innerText = "● LIVE STREAMING";
+                statusText.style.color = "#00ff88";
+                actionBtn.innerText = "Pause";
+                actionBtn.classList.add('playing');
+            } else {
+                audio.pause();
+                statusText.innerText = "Stream Paused";
+                statusText.style.color = "#8a8a93";
+                actionBtn.innerText = "Listen Live";
+                actionBtn.classList.remove('playing');
+            }
+        });
+    </script>
+</body>
+</html>

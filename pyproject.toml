@@ -1,0 +1,42 @@
+[project]
+name = "skip-radio"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Christian Andersen", email = "cdandersen98@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "fastapi[standard-no-fastapi-cloud-cli]>=0.136.3",
+    "platformdirs>=4.10.0",
+    "yt-dlp[default]>=2026.3.17",
+]
+
+[project.scripts]
+skip-radio = "skip_radio:main"
+
+[build-system]
+requires = ["uv_build>=0.11.17,<0.12.0"]
+build-backend = "uv_build"
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+  "COM812",  # missing-trailing-comma
+  "T20",  # flake8-print
+  "ERA",  # eradicate
+  "D",  # docstrings
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+    "ruff>=0.15.16",
+    "ty>=0.0.44",
+]
