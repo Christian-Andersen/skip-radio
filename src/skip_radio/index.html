@@ -36,28 +36,47 @@
             font-size: 0.9rem;
             margin-bottom: 30px;
         }
-        .btn-play {
-            background: #00ff88;
-            color: #0b0b0e;
+        .buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        .btn {
             border: none;
-            padding: 15px 40px;
+            padding: 15px 30px;
             font-size: 1.1rem;
             font-weight: bold;
             border-radius: 50px;
             cursor: pointer;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-        .btn-play:hover {
+        .btn-skip {
+            background: #00ff88;
+            color: #0b0b0e;
+            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+            flex: 1;
+        }
+        .btn-skip:hover {
             transform: scale(1.05);
             box-shadow: 0 6px 20px rgba(0, 255, 136, 0.5);
         }
-        .btn-play.playing {
-            background: #ff3b30;
-            color: white;
-            box-shadow: 0 4px 15px rgba(255, 59, 48, 0.3);
+        .btn-pause {
+            background: #2a2a3a;
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            width: 54px;
+            padding: 15px 0;
+        }
+        .btn-pause:hover {
+            transform: scale(1.05);
+            background: #3a3a4a;
+        }
+        .btn-pause.paused {
+            background: #00ff88;
+            color: #0b0b0e;
+            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
         }
         audio {
             display: none;
@@ -67,45 +86,55 @@
 <body>
     <div class="radio-card">
         <h1>SkipRadio</h1>
-        <div class="status" id="stream-status">Connecting to live stream...</div>
-        <audio id="audio-player" preload="auto">
-            <source src="/stream" type="audio/mp3">
-        </audio>
-        <button class="btn-play" id="action-btn">Tune In</button>
+        <div class="status" id="track-title">Loading...</div>
+        <div class="status" id="stream-status"><span style="color:#ff3b30">●</span> LIVE</div>
+        <audio id="audio-player" preload="auto"></audio>
+        <div class="buttons">
+            <button class="btn btn-pause" id="pause-btn">⏸</button>
+            <button class="btn btn-skip" id="skip-btn">Skip</button>
+        </div>
     </div>
     <script>
         const audio = document.getElementById('audio-player');
-        const actionBtn = document.getElementById('action-btn');
-        const statusText = document.getElementById('stream-status');
-        function startRadio() {
-            audio.play()
-                .then(() => {
-                    statusText.innerText = "● LIVE STREAMING";
-                    statusText.style.color = "#00ff88";
-                    actionBtn.innerText = "Mute / Pause";
-                    actionBtn.classList.add('playing');
-                })
-                .catch((error) => {
-                    statusText.innerText = "Click below to unmute & listen live";
-                    actionBtn.innerText = "Listen Live";
-                });
+        const pauseBtn = document.getElementById('pause-btn');
+        const skipBtn = document.getElementById('skip-btn');
+        const titleEl = document.getElementById('track-title');
+        const statusEl = document.getElementById('stream-status');
+        async function loadNext() {
+            const res = await fetch('/radio/next', { method: 'POST' });
+            if (!res.ok) {
+                titleEl.innerText = 'No tracks available';
+                return;
+            }
+            const track = await res.json();
+            titleEl.innerText = `${track.artist} — ${track.title}`;
+            audio.src = `/audio/${track.id}`;
+            audio.play();
+            pauseBtn.classList.remove('paused');
+            pauseBtn.innerText = '⏸';
         }
-        document.addEventListener("DOMContentLoaded", startRadio);
-        actionBtn.addEventListener('click', () => {
+        function togglePause() {
             if (audio.paused) {
                 audio.play();
-                statusText.innerText = "● LIVE STREAMING";
-                statusText.style.color = "#00ff88";
-                actionBtn.innerText = "Pause";
-                actionBtn.classList.add('playing');
+                pauseBtn.classList.remove('paused');
+                pauseBtn.innerText = '⏸';
             } else {
                 audio.pause();
-                statusText.innerText = "Stream Paused";
-                statusText.style.color = "#8a8a93";
-                actionBtn.innerText = "Listen Live";
-                actionBtn.classList.remove('playing');
+                pauseBtn.classList.add('paused');
+                pauseBtn.innerText = '▶';
             }
+        }
+        audio.addEventListener('ended', loadNext);
+        audio.addEventListener('error', () => {
+            statusEl.innerHTML = '<span style="color:#ff3b30">●</span> Audio not found — skipping';
+            loadNext();
         });
+        audio.addEventListener('playing', () => {
+            statusEl.innerHTML = '<span style="color:#ff3b30">●</span> LIVE';
+        });
+        skipBtn.addEventListener('click', loadNext);
+        pauseBtn.addEventListener('click', togglePause);
+        loadNext();
     </script>
 </body>
 </html>
