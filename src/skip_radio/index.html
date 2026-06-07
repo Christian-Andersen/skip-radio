@@ -34,7 +34,66 @@
         .status {
             color: #8a8a93;
             font-size: 0.9rem;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
+        }
+        #track-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px;
+            min-height: 1.6rem;
+        }
+        #track-artist {
+            font-size: 1rem;
+            color: #8a8a93;
+            margin-bottom: 20px;
+            min-height: 1.2rem;
+        }
+        .volume-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .volume-row span {
+            font-size: 1.2rem;
+            line-height: 1;
+            min-width: 28px;
+            text-align: center;
+        }
+        .volume-row input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            flex: 1;
+            height: 4px;
+            border-radius: 2px;
+            background: #2a2a3a;
+            outline: none;
+            cursor: pointer;
+        }
+        .volume-row input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #00ff88;
+            border: none;
+            cursor: pointer;
+        }
+        .volume-row input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #00ff88;
+            border: none;
+            cursor: pointer;
+        }
+        #volume-pct {
+            font-size: 0.8rem;
+            color: #8a8a93;
+            min-width: 32px;
+            text-align: right;
         }
         .buttons {
             display: flex;
@@ -86,8 +145,14 @@
 <body>
     <div class="radio-card">
         <h1>SkipRadio</h1>
-        <div class="status" id="track-title">Loading...</div>
+        <div id="track-title">Loading...</div>
+        <div id="track-artist"></div>
         <div class="status" id="stream-status"><span style="color:#ff3b30">●</span> LIVE</div>
+        <div class="volume-row">
+            <span>🔊</span>
+            <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="1">
+            <span id="volume-pct">100</span>
+        </div>
         <audio id="audio-player" preload="auto"></audio>
         <div class="buttons">
             <button class="btn btn-pause" id="pause-btn">⏸</button>
@@ -99,20 +164,37 @@
         const pauseBtn = document.getElementById('pause-btn');
         const skipBtn = document.getElementById('skip-btn');
         const titleEl = document.getElementById('track-title');
+        const artistEl = document.getElementById('track-artist');
         const statusEl = document.getElementById('stream-status');
-        async function loadNext() {
-            const res = await fetch('/radio/next', { method: 'POST' });
+        const volumeSlider = document.getElementById('volume-slider');
+        const volumePct = document.getElementById('volume-pct');
+
+        volumeSlider.addEventListener('input', () => {
+            audio.volume = volumeSlider.value;
+            volumePct.innerText = Math.round(volumeSlider.value * 100);
+        });
+
+        async function loadNext(action, elapsed) {
+            const body = JSON.stringify({action: action || 'next', elapsed: elapsed || 0});
+            const res = await fetch('/radio/next', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: body
+            });
             if (!res.ok) {
                 titleEl.innerText = 'No tracks available';
+                artistEl.innerText = '';
                 return;
             }
             const track = await res.json();
-            titleEl.innerText = `${track.artist} — ${track.title}`;
+            titleEl.innerText = track.title;
+            artistEl.innerText = track.artist;
             audio.src = `/audio/${track.id}`;
             audio.play();
             pauseBtn.classList.remove('paused');
             pauseBtn.innerText = '⏸';
         }
+
         function togglePause() {
             if (audio.paused) {
                 audio.play();
@@ -124,17 +206,18 @@
                 pauseBtn.innerText = '▶';
             }
         }
-        audio.addEventListener('ended', loadNext);
+
+        audio.addEventListener('ended', () => loadNext('next'));
         audio.addEventListener('error', () => {
             statusEl.innerHTML = '<span style="color:#ff3b30">●</span> Audio not found — skipping';
-            loadNext();
+            loadNext('skip', audio.currentTime);
         });
         audio.addEventListener('playing', () => {
             statusEl.innerHTML = '<span style="color:#ff3b30">●</span> LIVE';
         });
-        skipBtn.addEventListener('click', loadNext);
+        skipBtn.addEventListener('click', () => loadNext('skip', audio.currentTime));
         pauseBtn.addEventListener('click', togglePause);
-        loadNext();
+        loadNext('next');
     </script>
 </body>
 </html>

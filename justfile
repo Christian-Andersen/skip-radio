@@ -18,7 +18,7 @@ check:
     uvx prek@latest run --all-files
 
 run *args:
-    uv run skip-radio {{ args }}
+    rm ./data/songs.db; uv run skip-radio {{ args }}
 
 test *args:
     uv run -- pytest {{ args }}

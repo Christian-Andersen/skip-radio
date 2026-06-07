@@ -12,6 +12,7 @@ dependencies = [
     "loguru>=0.7.3",
     "sqlalchemy>=2.0.50",
     "yt-dlp[default]>=2026.3.17",
+    "ytmusicapi>=1.12.1",
 ]
 
 [project.scripts]
