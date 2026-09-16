@@ -28,6 +28,7 @@ line-length = 120
 select = ["ALL"]
 ignore = [
   "COM812",  # missing-trailing-comma
+  "CPY",     # copyright
 ]
 
 [tool.ruff.lint.pydocstyle]
@@ -35,6 +36,7 @@ convention = "google"
 
 [dependency-groups]
 dev = [
+    "prek>=0.5.3",
     "pytest>=9.0.3",
     "ruff>=0.15.16",
     "ty>=0.0.44",

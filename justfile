@@ -15,7 +15,7 @@ bootstrap:
     uv sync --locked
 
 check:
-    uvx prek@latest run --all-files
+    uv run -- prek run --all-files
 
 run *args:
     rm ./data/songs.db; uv run skip-radio {{ args }}
