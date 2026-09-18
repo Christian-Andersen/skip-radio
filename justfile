@@ -7,9 +7,6 @@ alias t := test
 default:
     @just --choose
 
-setup:
-    uv python install 3.14
-
 check:
     uv run -- prek run --all-files
 
@@ -22,4 +19,4 @@ test *args:
 audit:
     uv audit
 
-ci: setup audit check test
+ci: audit check test

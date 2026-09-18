@@ -17,6 +17,7 @@
           just
           prek
           uv
+          python314
         ];
       };
     };
