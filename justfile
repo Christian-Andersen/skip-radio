@@ -4,7 +4,6 @@ alias a := audit
 alias c := check
 alias r := run
 alias t := test
-alias ci := continuous_integration
 
 [private]
 default:
@@ -26,4 +25,4 @@ test *args:
 audit:
     uv audit
 
-continuous_integration: bootstrap audit check test
+ci: bootstrap audit check test
