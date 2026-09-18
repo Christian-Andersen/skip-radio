@@ -9,9 +9,8 @@ alias t := test
 default:
     @just --choose
 
-bootstrap:
-    @command -v uv >/dev/null 2>&1 || { echo "Error: uv is required but was not found in PATH." >&2; exit 1; }
-    uv sync --locked
+setup:
+    uv python install 3.14
 
 check:
     uv run -- prek run --all-files
@@ -25,4 +24,4 @@ test *args:
 audit:
     uv audit
 
-ci: bootstrap audit check test
+ci: setup audit check test
