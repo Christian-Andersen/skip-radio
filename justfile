@@ -1,5 +1,3 @@
-export PYTHON_GIL := "0"
-
 alias a := audit
 alias c := check
 alias r := run
