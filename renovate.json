@@ -12,5 +12,22 @@
       "matchManagers": ["nix"],
       "groupName": "Nix flake inputs"
     }
+  ],
+  "pyenv": {
+    "enabled": false
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Track Python version requests in .python-version, preserving a flavor suffix such as +gil",
+      "managerFilePatterns": ["/(^|/)\\.python-version$/"],
+      "matchStrings": [
+        "^(?<currentValue>\\d+\\.\\d+(?:\\.\\d+)?)(?<suffix>\\+[A-Za-z0-9._-]+)?\\s*$"
+      ],
+      "autoReplaceStringTemplate": "{{{newValue}}}{{{suffix}}}",
+      "depNameTemplate": "python",
+      "datasourceTemplate": "python-version",
+      "versioningTemplate": "python"
+    }
   ]
 }
