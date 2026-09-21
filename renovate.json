@@ -6,5 +6,11 @@
   "lockFileMaintenance": {
     "enabled": true,
     "extends": ["schedule:weekly"]
-  }
+  },
+  "packageRules": [
+    {
+      "matchManagers": ["nix"],
+      "groupName": "Nix flake inputs"
+    }
+  ]
 }
