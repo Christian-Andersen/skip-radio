@@ -1,7 +1,7 @@
 [project]
 name = "skip-radio"
 version = "0.1.0"
-description = "Add your description here"
+description = "A personal internet radio server"
 readme = "README.md"
 authors = [
     { name = "Christian Andersen", email = "cdandersen98@gmail.com" }
