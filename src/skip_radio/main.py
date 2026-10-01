@@ -31,8 +31,6 @@ class InterceptHandler(logging.Handler):
         except ValueError:
             level = record.levelno
         frame, depth = logging.currentframe(), 2
-        if frame is None:
-            frame = logging.currentframe()
         while frame is not None and frame.f_code.co_filename == logging.__file__:
             frame = frame.f_back
             depth += 1
