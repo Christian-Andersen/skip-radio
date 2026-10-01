@@ -287,7 +287,7 @@ async def get_audio(song_id: str) -> FileResponse:
             path = download_song(song_id)
     if not path.exists():
         raise HTTPException(status_code=404, detail="File not found")
-    return FileResponse(path, media_type="audio/mp3")
+    return FileResponse(path, media_type="audio/mpeg")
 
 
 def main() -> int:
