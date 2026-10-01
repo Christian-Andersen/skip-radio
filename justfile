@@ -11,7 +11,7 @@ check:
     uv run -- prek run --all-files
 
 run *args:
-    rm ./data/songs.db; uv run skip-radio {{ args }}
+    rm -f ./data/songs.db; uv run skip-radio {{ args }}
 
 test *args:
     uv run -- pytest {{ args }}
