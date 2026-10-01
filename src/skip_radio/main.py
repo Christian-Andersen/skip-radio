@@ -147,7 +147,8 @@ class RadioStation:
                 if not video_id:
                     continue
                 title = track.get("title", "Unknown")
-                artist_name = track["artists"][0]["name"] if track.get("artists") else "Unknown"
+                artists = track.get("artists")
+                artist_name = artists[0]["name"] if isinstance(artists, list) and artists else "Unknown"
                 if session.get(Song, video_id) is None:
                     session.add(Song(id=video_id, title=title, artist=artist_name))
             session.commit()
