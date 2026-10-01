@@ -8,3 +8,6 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Runtime data (sqlite db + cached mp3s, also covered by data/.gitignore)
+data/
