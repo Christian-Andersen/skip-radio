@@ -247,7 +247,7 @@ def download_song(song_id: str) -> Path:
                 "preferredcodec": "mp3",
             }
         ],
-        "outtmpl": f"{MUSIC_DIR}/%(id)s.%(ext)s",
+        "outtmpl": str(MUSIC_DIR / "%(id)s.%(ext)s"),
     }
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
