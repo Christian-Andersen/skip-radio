@@ -42,7 +42,9 @@ class InterceptHandler(logging.Handler):
 HERE = Path(__file__).parent
 DATA_DIR = HERE.parent.parent / "data"
 DATA_DIR.mkdir(exist_ok=True)
-(DATA_DIR / ".gitignore").write_text("*")
+_gitignore = DATA_DIR / ".gitignore"
+if not _gitignore.exists():
+    _gitignore.write_text("*\n")
 logger.info(f"{DATA_DIR=}")
 MUSIC_DIR = DATA_DIR / "music"
 MUSIC_DIR.mkdir(exist_ok=True)
