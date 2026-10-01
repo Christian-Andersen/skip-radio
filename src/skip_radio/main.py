@@ -285,7 +285,7 @@ async def get_audio(song_id: str) -> FileResponse:
                 if path.exists():
                     break
         if not path.exists():
-            path = download_song(song_id)
+            path = await asyncio.to_thread(download_song, song_id)
     if not path.exists():
         raise HTTPException(status_code=404, detail="File not found")
     return FileResponse(path, media_type="audio/mpeg")
