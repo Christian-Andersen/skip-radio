@@ -31,8 +31,6 @@ class InterceptHandler(logging.Handler):
         except ValueError:
             level = record.levelno
         frame, depth = logging.currentframe(), 2
-        if frame is None:
-            frame = logging.currentframe()
         while frame is not None and frame.f_code.co_filename == logging.__file__:
             frame = frame.f_back
             depth += 1
@@ -42,7 +40,9 @@ class InterceptHandler(logging.Handler):
 HERE = Path(__file__).parent
 DATA_DIR = HERE.parent.parent / "data"
 DATA_DIR.mkdir(exist_ok=True)
-(DATA_DIR / ".gitignore").write_text("*")
+_gitignore = DATA_DIR / ".gitignore"
+if not _gitignore.exists():
+    _gitignore.write_text("*\n")
 logger.info(f"{DATA_DIR=}")
 MUSIC_DIR = DATA_DIR / "music"
 MUSIC_DIR.mkdir(exist_ok=True)
@@ -145,7 +145,8 @@ class RadioStation:
                 if not video_id:
                     continue
                 title = track.get("title", "Unknown")
-                artist_name = track["artists"][0]["name"] if track.get("artists") else "Unknown"
+                artists = track.get("artists")
+                artist_name = artists[0]["name"] if isinstance(artists, list) and artists else "Unknown"
                 if session.get(Song, video_id) is None:
                     session.add(Song(id=video_id, title=title, artist=artist_name))
             session.commit()
@@ -247,7 +248,7 @@ def download_song(song_id: str) -> Path:
                 "preferredcodec": "mp3",
             }
         ],
-        "outtmpl": f"{MUSIC_DIR}/%(id)s.%(ext)s",
+        "outtmpl": str(MUSIC_DIR / "%(id)s.%(ext)s"),
     }
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -284,10 +285,10 @@ async def get_audio(song_id: str) -> FileResponse:
                 if path.exists():
                     break
         if not path.exists():
-            path = download_song(song_id)
+            path = await asyncio.to_thread(download_song, song_id)
     if not path.exists():
         raise HTTPException(status_code=404, detail="File not found")
-    return FileResponse(path, media_type="audio/mp3")
+    return FileResponse(path, media_type="audio/mpeg")
 
 
 def main() -> int:
